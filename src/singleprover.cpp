@@ -5,6 +5,8 @@
 #include "wtns_utils.hpp"
 
 SingleProver::SingleProver(std::string zkeyFileName) {
+    LOG_INFO("SingleProver::SingleProver begin");
+    auto t0 = std::chrono::steady_clock::now();
 
     mpz_init(altBbn128r);
     mpz_set_str(altBbn128r, "21888242871839275222246405745257275088548364400416034343698204186575808495617", 10);
@@ -35,7 +37,10 @@ SingleProver::SingleProver(std::string zkeyFileName) {
         zKey->getSectionData(9)     // pointsH1
     );
 
-    LOG_INFO("SingleProver::SingleProver initialized from zkey");
+    auto t1 = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+    std::string output("SingleProver::SingleProver initialized from zkey in " + std::to_string(duration) + "ms");
+    LOG_INFO(output);
 }
 
 SingleProver::~SingleProver()
@@ -47,6 +52,7 @@ json SingleProver::startProve(std::string input)
 {
     LOG_INFO("SingleProver::startProve begin");
 
+    auto t0 = std::chrono::steady_clock::now();
     // TODO: Do not log PII. prover->prove also logs the ZK proof, which we might not want to log.
     LOG_DEBUG(input);
 
@@ -89,7 +95,16 @@ json SingleProver::startProve(std::string input)
     }
 
     AltBn128::FrElement *wtnsData = (AltBn128::FrElement *)wtns->getSectionData(2);
+    auto t1 = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+    std::string output("Witness generation finished in " + std::to_string(duration) + "ms");
+    LOG_INFO(output);
+
     auto proof = prover->prove(wtnsData);
+    auto t2 = std::chrono::steady_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+    output = "Proof generation finished in " + std::to_string(duration) + "ms";
+    LOG_INFO(output);
 
     return proof->toJson();
 }
