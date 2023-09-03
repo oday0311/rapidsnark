@@ -16,10 +16,10 @@ int main(int argc, char **argv) {
     }
 
     Logger::getInstance()->enableConsoleLogging();
-    Logger::getInstance()->updateLogLevel(LOG_LEVEL_DEBUG);
+    Logger::getInstance()->updateLogLevel(LOG_LEVEL_INFO);
     LOG_INFO("Initializing server...");
     int port = std::stoi(argv[1]); // parse port
-    // parse the zkeys
+    // parse the zkey
     std::string zkeyFileName = argv[2];
 
     SingleProver prover(zkeyFileName);

@@ -48,6 +48,19 @@ SingleProver::~SingleProver()
     mpz_clear(altBbn128r);
 }
 
+#include <unistd.h>
+
+// Function to generate a unique temporary file name
+std::string generateTempFileName() {
+    char templateName[] = "/tmp/zklogin_XXXXXX";
+    int fd;
+    if ((fd = mkstemp(templateName)) == -1) {
+        throw std::runtime_error("Failed to create a unique temporary file name");
+    }
+    close(fd);
+    return templateName;
+}
+
 json SingleProver::startProve(std::string input)
 {
     LOG_INFO("SingleProver::startProve begin");
@@ -57,12 +70,13 @@ json SingleProver::startProve(std::string input)
     LOG_DEBUG(input);
 
     json j = json::parse(input);
-    std::ofstream file("./build/input.json");
+    std::string inputFileName = generateTempFileName();
+    std::ofstream file(inputFileName);
     file << j;
     file.close();
 
-    std::string witnessFile("./build/witness.wtns");
-    std::string command("./build/zkLogin ./build/input.json " + witnessFile);
+    std::string witnessFileName = generateTempFileName();
+    std::string command("./build/zkLogin " + inputFileName + " " + witnessFileName);
     LOG_INFO(command);
     std::array<char, 128> buffer;
     std::string result;
@@ -88,7 +102,7 @@ json SingleProver::startProve(std::string input)
         LOG_INFO(str);
     }
 
-    auto wtns = BinFileUtils::openExisting(witnessFile, "wtns", 2);
+    auto wtns = BinFileUtils::openExisting(witnessFileName, "wtns", 2);
     auto wtnsHeader = WtnsUtils::loadHeader(wtns.get());
     if (mpz_cmp(wtnsHeader->prime, altBbn128r) != 0) {
         throw std::invalid_argument( "different wtns curve" );
@@ -105,6 +119,9 @@ json SingleProver::startProve(std::string input)
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
     output = "Proof generation finished in " + std::to_string(duration) + "ms";
     LOG_INFO(output);
+
+    unlink(witnessFileName.c_str());
+    unlink(inputFileName.c_str());
 
     return proof->toJson();
 }
