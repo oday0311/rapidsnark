@@ -40,7 +40,7 @@ function buildProverServer() {
         " -I../depends/ffiasm/c"+
         " ../src/main_proofserver.cpp"+
         " ../src/proverapi.cpp"+
-        " ../src/fullprover.cpp"+
+        " ../src/singleprover.cpp"+
         " ../src/binfile_utils.cpp"+
         " ../src/wtns_utils.cpp"+
         " ../src/zkey_utils.cpp"+
@@ -55,7 +55,7 @@ function buildProverServer() {
         " fr.o"+
         " -L../depends/pistache/build/src -lpistache"+
         " -o proverServer"+
-        " -fmax-errors=5 -pthread -std=c++17 -fopenmp -lgmp -lsodium -g -DSANITY_CHECK", {cwd: "build", nopipe: true}
+        " -fmax-errors=5 -pthread -std=c++17 -fopenmp -lgmp -lsodium -O3 -g -DSANITY_CHECK", {cwd: "build", nopipe: true}
     );
 }
 
