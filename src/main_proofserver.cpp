@@ -9,7 +9,7 @@ using namespace Pistache;
 using namespace Pistache::Rest;
 
 int main(int argc, char **argv) {
-    if (argc < 3) {
+    if (argc != 3) {
         std::cerr << "Invalid number of parameters:\n";
         std::cerr << "Usage: proverServer <port> <circuit.zkey> \n";
         return -1;
