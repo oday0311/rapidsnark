@@ -1,3 +1,4 @@
+#include <cstdlib> // for getenv
 #include <pistache/router.h>
 #include <pistache/endpoint.h>
 #include "proverapi.hpp"
@@ -8,21 +9,49 @@ using namespace CPlusPlusLogging;
 using namespace Pistache;
 using namespace Pistache::Rest;
 
-int main(int argc, char **argv) {
-    if (argc != 3) {
-        std::cerr << "Invalid number of parameters:\n";
-        std::cerr << "Usage: proverServer <port> <circuit.zkey> \n";
-        return -1;
-    }
+void printUsage() {
+    std::cerr << "Invalid usage\n";
+    std::cerr << "Either use command line args: ./proverServer <zkLogin.zkey> <path_to_binaries>\n";
+    std::cerr << "Or set ZKEY and WITNESS_BINARIES env variables and call ./proverServer\n";
+}
 
+int main(int argc, char **argv) {
     Logger::getInstance()->enableConsoleLogging();
     Logger::getInstance()->updateLogLevel(LOG_LEVEL_INFO);
     LOG_INFO("Initializing server...");
-    int port = std::stoi(argv[1]); // parse port
-    // parse the zkey
-    std::string zkeyFileName = argv[2];
 
-    SingleProver prover(zkeyFileName);
+    int port = 8080;
+    LOG_INFO("Starting at port 8080");
+
+    // The path to the zkey file, e.g., "/app/zkLogin.zkey"
+    std::string zkeyFilePath;
+    // The folder name in which zkLogin and zkLogin.dat binaries can be found.
+    std::string binariesFolderPath;
+
+    if (argc == 3) {
+        zkeyFilePath = argv[1];
+        binariesFolderPath = argv[2];
+    } else if (argc == 1) {
+        LOG_INFO("Reading from environment variables ZKEY and WITNESS_BINARIES");
+        if (const char* x = getenv("ZKEY")) {
+            zkeyFilePath = x;
+        } else {
+            printUsage();
+            return -1;
+        }
+
+        if (const char* x = getenv("WITNESS_BINARIES")) {
+            binariesFolderPath = x;
+        } else {
+            printUsage();
+            return -1;
+        }
+    } else {
+        printUsage();
+        return -1;
+    }
+
+    SingleProver prover(zkeyFilePath, binariesFolderPath);
     ProverAPI proverAPI(prover);
     Address addr(Ipv4::any(), Port(port));
 

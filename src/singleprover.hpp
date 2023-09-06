@@ -17,13 +17,15 @@
  */
 class SingleProver {
 
+    std::string binariesFolderPath; // where to find zkLogin and zkLogin.dat
+    std::string witnessBinaryFilePath;
     mpz_t altBbn128r;
     std::unique_ptr<Groth16::Prover<AltBn128::Engine> > prover;
     std::unique_ptr<ZKeyUtils::Header> zkHeader;
     std::unique_ptr<BinFileUtils::BinFile> zKey;
 
 public: 
-    SingleProver(std::string zkeyFileName);
+    SingleProver(std::string zkeyFilePath, std::string binariesFolderPath);
     ~SingleProver();
     json startProve(std::string input);
 };
