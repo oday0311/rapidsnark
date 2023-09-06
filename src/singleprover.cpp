@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include <singleprover.hpp>
 #include "fr.hpp"
 
@@ -48,12 +50,12 @@ SingleProver::~SingleProver()
     mpz_clear(altBbn128r);
 }
 
-#include <unistd.h>
-
 // Function to generate a unique temporary file name
 std::string generateTempFileName() {
     char templateName[] = "/tmp/zklogin_XXXXXX";
     int fd;
+    // TODO: See if C++ stdlib has a better alternative
+    // Note: The main req for us is that it returns a unique file name
     if ((fd = mkstemp(templateName)) == -1) {
         throw std::runtime_error("Failed to create a unique temporary file name");
     }
@@ -81,23 +83,10 @@ json SingleProver::startProve(std::string input)
     std::array<char, 128> buffer;
     std::string result;
 
-    FILE* pipe = popen(command.c_str(), "r");
-    if (!pipe)
-    {
-        throw std::runtime_error("Couldn't start command");
-    }
-    while (fgets(buffer.data(), 128, pipe) != NULL) {
-        result += buffer.data();
-    }
-    auto returnCode = pclose(pipe);
-
-    if (result != "") {
-        LOG_INFO("Unexpected result");
-        LOG_INFO(result);
-    }
+    int returnCode = std::system(command.c_str());
 
     if (returnCode != 0) {
-        LOG_INFO("Unexpected return code");
+        LOG_INFO("Unexpected returnCode");
         auto str = std::to_string(returnCode);
         LOG_INFO(str);
     }
