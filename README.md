@@ -47,6 +47,9 @@ by this one
 ````sh
 ./build/prover <circuit.zkey> <witness.wtns> <proof.json> <public.json>
 ````
+
+Note that the first two arguments are the input files whereas the last two correspond to the output files. It takes the zkey (`circuit.zkey`) and a witness (`witness.wtns`) as inputs, and outputs a proof (`proof.json`) and the public inputs (`public.json`).
+
 ## Launch prover in server mode
 
 In server mode, the prover also compiles the inputs to generate a witness.
