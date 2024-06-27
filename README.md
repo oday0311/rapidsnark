@@ -54,7 +54,7 @@ Note that the first two arguments are the input files whereas the last two corre
 
 In server mode, the prover also compiles the inputs to generate a witness.
 
-If your circuit's name is `circuit.circom`, then you have to generate the C++ binaries using circom ([link from circom docs](https://docs.circom.io/getting-started/computing-the-witness/#computing-the-witness-with-c)). In the end, you should have two files `circuit` and `circuit.dat`.
+If your circuit's name is `circuit.circom`, then you have to generate the C++ binaries using circom ([link from circom docs](https://docs.circom.io/getting-started/computing-the-witness/#computing-the-witness-with-c)). In the end, you should have two files `circuit` and `circuit.dat`.   【what is circuit.dat come from, can anyone give a detail?】
 
 To launch the server, set two environment variables:
 1. `ZKEY`: Pointing to the zkey file
